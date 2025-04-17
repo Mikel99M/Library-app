@@ -27,7 +27,7 @@ public class BorrowedMapper {
                 borrowed.getCopy().getId(),
                 borrowed.getReader().getId(),
                 borrowed.getLoanDate(),
-                borrowed.getLoanDate()
+                borrowed.getDueDate()
         );
     }
 

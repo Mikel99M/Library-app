@@ -24,9 +24,9 @@ public class CopyController {
         return ResponseEntity.ok(service.getAllCopies());
     }
 
-    @GetMapping(value = "/{copyId}")
-    public ResponseEntity<CopyDto> getCopy(@PathVariable Long copyId) throws CopyNotFoundException {
-        return ResponseEntity.ok(service.getCopyById(copyId));
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<CopyDto> getCopy(@PathVariable Long id) throws CopyNotFoundException {
+        return ResponseEntity.ok(service.getCopyById(id));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -39,9 +39,9 @@ public class CopyController {
         return ResponseEntity.ok(service.updateCopy(copyDto, id));
     }
 
-    @DeleteMapping(value = "/{copyId}")
-    public ResponseEntity<Void> deleteCopy(@PathVariable Long copyId) throws CopyNotFoundException {
-        service.deleteCopy(copyId);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteCopy(@PathVariable Long id) throws CopyNotFoundException {
+        service.deleteCopy(id);
         return ResponseEntity.noContent().build();
     }
 
