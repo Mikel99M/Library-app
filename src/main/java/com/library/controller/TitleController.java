@@ -1,9 +1,7 @@
 package com.library.controller;
 
-import com.library.domain.Title;
 import com.library.domain.TitleDto;
 import com.library.exception.TitleNotFoundException;
-import com.library.mapper.TitleMapper;
 import com.library.service.TitleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -18,36 +16,30 @@ import java.util.List;
 public class TitleController {
 
     private final TitleService service;
-    private final TitleMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<TitleDto>> getTitles() {
         return ResponseEntity.ok(service.getAllTitles());
     }
 
-    @GetMapping(value = "/{titleId}")
-    public ResponseEntity<TitleDto> getTitle(@PathVariable Long titleId) {
-        return ResponseEntity.ok(mapper.mapToTitleDto(service.getTitleById(titleId)));
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<TitleDto> getTitle(@PathVariable Long id) throws TitleNotFoundException {
+        return ResponseEntity.ok(service.getTitleById(id));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TitleDto> createTitle(@RequestBody TitleDto titleDto) {
-        Title title = mapper.mapToTitle(titleDto);
-        service.saveTitle(title);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(service.addTitle(titleDto));
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<TitleDto> updateTitle(@PathVariable Long id, @RequestBody TitleDto titleDto) {
-        Title title = mapper.mapToTitle(titleDto);
-        title.setId(id);
-        Title updatedTitle = service.saveTitle(title);
-        return ResponseEntity.ok(mapper.mapToTitleDto(updatedTitle));
+    public ResponseEntity<TitleDto> updateTitle(@PathVariable Long id, @RequestBody TitleDto titleDto) throws TitleNotFoundException {
+        return ResponseEntity.ok(service.updateTitle(titleDto, id));
     }
 
-    @DeleteMapping(value = "/{titleId}")
-    public ResponseEntity<Void> deleteTitle(@PathVariable Long titleId) throws TitleNotFoundException {
-        service.deleteTitle(titleId);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteTitle(@PathVariable Long id) throws TitleNotFoundException {
+        service.deleteTitle(id);
         return ResponseEntity.noContent().build();
     }
 

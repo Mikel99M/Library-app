@@ -3,7 +3,6 @@ package com.library.mapper;
 import com.library.domain.Copy;
 import com.library.domain.CopyDto;
 import com.library.domain.Title;
-import com.library.repository.CopyRepository;
 import com.library.repository.TitleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 public class CopyMapper {
 
     private final TitleRepository titleRepository;
-    private final CopyRepository copyRepository;
 
     public Copy mapToCopy(final CopyDto copyDto) {
         if (copyDto == null || copyDto.getTitleId() == null) {

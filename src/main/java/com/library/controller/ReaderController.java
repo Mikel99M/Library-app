@@ -1,11 +1,11 @@
 package com.library.controller;
 
-import com.library.domain.Reader;
 import com.library.domain.ReaderDto;
 import com.library.exception.ReaderNotFoundException;
-import com.library.mapper.ReaderMapper;
 import com.library.service.ReaderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReaderController {
 
-    private final ReaderMapper mapper;
     private final ReaderService service;
 
     @GetMapping
@@ -37,22 +36,17 @@ public class ReaderController {
 
     @GetMapping(value = "/{readerId}")
     public ResponseEntity<ReaderDto> getReader(@PathVariable Long readerId) throws ReaderNotFoundException{
-        return ResponseEntity.ok(mapper.mapToReaderDto(service.getReaderById(readerId)));
+        return ResponseEntity.ok(service.getReaderById(readerId));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReaderDto> createReader(@RequestBody ReaderDto readerDto) {
-        Reader reader = mapper.mapToReader(readerDto);
-        service.saveReader(reader);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ReaderDto> createReader(@Valid @RequestBody ReaderDto readerDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.addReader(readerDto));
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<ReaderDto> updateReader(@PathVariable Long id, @RequestBody ReaderDto readerDto) {
-        Reader reader = mapper.mapToReader(readerDto);
-        reader.setId(id);
-        Reader updatedReader = service.saveReader(reader);
-        return ResponseEntity.ok(mapper.mapToReaderDto(updatedReader));
+    public ResponseEntity<ReaderDto> updateReader(@PathVariable Long id, @RequestBody ReaderDto readerDto) throws ReaderNotFoundException {
+        return ResponseEntity.ok(service.updateReader(readerDto, id));
     }
 
     @DeleteMapping(value = "/{readerId}")
@@ -60,5 +54,4 @@ public class ReaderController {
         service.deleteReader(readerId);
         return ResponseEntity.noContent().build();
     }
-
 }

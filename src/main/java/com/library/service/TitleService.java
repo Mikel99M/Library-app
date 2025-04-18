@@ -16,25 +16,34 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class TitleService {
 
-    private final TitleRepository repository;
-    private final TitleMapper mapper;
+    private final TitleRepository titleRepository;
+    private final TitleMapper titleMapper;
 
     public List<TitleDto> getAllTitles() {
-        return mapper.mapToTitleDtoList(repository.findAll());
+        return titleMapper.mapToTitleDtoList(titleRepository.findAll());
     }
 
-    public Title getTitleById(final Long titleId) {
-        return repository.findById(titleId).orElse(null);
+    public TitleDto getTitleById(final Long titleId) throws TitleNotFoundException {
+        return titleMapper.mapToTitleDto(titleRepository.findById(titleId).orElseThrow(()-> new TitleNotFoundException("Title with id " + titleId + " not found")));
     }
 
     @Transactional
-    public Title saveTitle(final Title title) {
-        return repository.save(title);
+    public TitleDto addTitle(final TitleDto titleDto) {
+        return titleMapper.mapToTitleDto(titleRepository.save(titleMapper.mapToTitle(titleDto)));
+    }
+
+    @Transactional
+    public TitleDto updateTitle(final TitleDto titleDto, final Long titleId) throws TitleNotFoundException {
+        Title title = titleRepository.findById(titleId).orElseThrow(()-> new TitleNotFoundException("Title with id " + titleId + " not found"));
+        title.setTitle(titleDto.getTitle());
+        title.setAuthor(titleDto.getAuthor());
+        title.setPublicationDate(titleDto.getPublicationDate());
+        return titleMapper.mapToTitleDto(titleRepository.save(title));
     }
 
     @Transactional
     public void deleteTitle(final Long titleID) throws TitleNotFoundException {
-        Title title = repository.findById(titleID).orElseThrow(TitleNotFoundException::new);
-        repository.delete(title);
+        Title title = titleRepository.findById(titleID).orElseThrow(()-> new TitleNotFoundException("Title with id " + titleID + " not found"));
+        titleRepository.delete(title);
     }
 }
