@@ -1,5 +1,6 @@
 package com.library.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +17,6 @@ public class ReaderDto {
     private String name;
     private String lastName;
     private LocalDateTime dateOfCreation;
+    @JsonIgnore
     private List<Borrowed> borrowedBooks;
 }

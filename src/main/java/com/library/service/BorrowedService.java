@@ -2,7 +2,10 @@ package com.library.service;
 
 import com.library.domain.Borrowed;
 import com.library.domain.BorrowedDto;
+import com.library.domain.Copy;
+import com.library.domain.CopyStatus;
 import com.library.exception.BorrowedBookNotFoundException;
+import com.library.exception.CopyNotFoundException;
 import com.library.mapper.BorrowedMapper;
 import com.library.repository.BorrowedRepository;
 import com.library.repository.CopyRepository;
@@ -32,9 +35,18 @@ public class BorrowedService {
     }
 
     @Transactional
-    public BorrowedDto addBorrowedBook(final BorrowedDto borrowedDto) {
-        Borrowed borrowed = borrowedMapper.mapToBorrowed(borrowedDto);
-        return borrowedMapper.mapToBorrowedDto(borrowedRepository.save(borrowed));
+    public BorrowedDto addBorrowedBook(final BorrowedDto borrowedDto) throws CopyNotFoundException {
+        //This checks whether Copy we want is AVAILABLE and if so changes its status to BORROWED
+        Copy copy = copyRepository.findById(borrowedDto.getCopyId()).orElseThrow(() -> new CopyNotFoundException("Copy with id " + borrowedDto.getCopyId() + " not found"));
+        if(copy.getStatus().equals(CopyStatus.AVAILABLE)) {
+
+            copy.setStatus(CopyStatus.BORROWED);
+
+            Borrowed borrowed = borrowedMapper.mapToBorrowed(borrowedDto);
+            return borrowedMapper.mapToBorrowedDto(borrowedRepository.save(borrowed));
+        } else {
+            throw new IllegalArgumentException("Borrowed book is not available");
+        }
     }
 
     @Transactional
@@ -48,8 +60,13 @@ public class BorrowedService {
     }
 
     @Transactional
-    public void deleteBorrowedBook(final Long id) throws BorrowedBookNotFoundException {
+    public void deleteBorrowedBook(final Long id) throws BorrowedBookNotFoundException, CopyNotFoundException {
+        //This changes book back to AVAILABLE when deleted
         Borrowed borrowed = borrowedRepository.findById(id).orElseThrow(()-> new BorrowedBookNotFoundException("Book with id " + id + " not found"));
+        Copy copy = copyRepository.findById(borrowed.getCopy().getId()).orElseThrow(()-> new CopyNotFoundException("Copy with id " + borrowed.getCopy().getId() + " not found"));
+        if(copy.getStatus().equals(CopyStatus.BORROWED)) {
+            copy.setStatus(CopyStatus.AVAILABLE);
+        }
         borrowedRepository.delete(borrowed);
     }
 }

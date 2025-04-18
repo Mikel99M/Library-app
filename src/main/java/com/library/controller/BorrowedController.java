@@ -29,7 +29,7 @@ public class BorrowedController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BorrowedDto> addBorrowedBook(@Valid @RequestBody BorrowedDto borrowedDto) {
+    public ResponseEntity<BorrowedDto> addBorrowedBook(@Valid @RequestBody BorrowedDto borrowedDto) throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addBorrowedBook(borrowedDto));
     }
 
@@ -39,7 +39,7 @@ public class BorrowedController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteBorrowedBook(@PathVariable long id) {
+    public ResponseEntity<Void> deleteBorrowedBook(@PathVariable long id) throws Exception {
         service.deleteBorrowedBook(id);
         return ResponseEntity.noContent().build();
     }
